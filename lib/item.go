@@ -167,6 +167,9 @@ func (item Item) AddParam() interface{} {
 	if item.ProjectID != "" {
 		param["project_id"] = item.ProjectID
 	}
+	if item.SectionID != "" {
+		param["section_id"] = item.SectionID
+	}
 	if item.Due != nil {
 		param["due"] = item.Due
 	}
@@ -202,10 +205,13 @@ func (item Item) UpdateParam() interface{} {
 	return param
 }
 
-func (item *Item) MoveParam(projectId string) interface{} {
+func (item *Item) MoveParam(projectId string, sectionId string) interface{} {
 	param := map[string]interface{}{
 		"id":         item.ID,
 		"project_id": projectId,
+	}
+	if sectionId != "" {
+		param["section_id"] = sectionId
 	}
 	return param
 }
@@ -246,9 +252,9 @@ func (c *Client) DeleteItem(ctx context.Context, ids []string) error {
 	return c.ExecCommands(ctx, commands)
 }
 
-func (c *Client) MoveItem(ctx context.Context, item *Item, projectId string) error {
+func (c *Client) MoveItem(ctx context.Context, item *Item, projectId string, sectionId string) error {
 	commands := Commands{
-		NewCommand("item_move", item.MoveParam(projectId)),
+		NewCommand("item_move", item.MoveParam(projectId, sectionId)),
 	}
 	return c.ExecCommands(ctx, commands)
 }

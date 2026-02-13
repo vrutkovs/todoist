@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sachaos/todoist/lib"
+	todoist "github.com/sachaos/todoist/lib"
 	"github.com/urfave/cli/v2"
 )
 
@@ -37,6 +37,27 @@ func Add(c *cli.Context) error {
 		item.ProjectID = projectId
 	} else {
 		item.ProjectID = c.String("project-id")
+	}
+
+	sectionName := c.String("section-name")
+	item.SectionID = c.String("section-id")
+	if sectionName != "" {
+		var sectionID string
+		for _, section := range client.Store.Sections {
+			if section.Name == sectionName {
+				if item.ProjectID == "" || item.ProjectID == section.ProjectID {
+					sectionID = section.ID
+					if item.ProjectID == "" {
+						item.ProjectID = section.ProjectID
+					}
+					break
+				}
+			}
+		}
+		if sectionID == "" {
+			return fmt.Errorf("did not find a section named '%v'", sectionName)
+		}
+		item.SectionID = sectionID
 	}
 
 	item.LabelNames = func(str string) []string {
