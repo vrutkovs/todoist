@@ -72,6 +72,16 @@ func main() {
 		Aliases: []string{"N"},
 		Usage:   "project name",
 	}
+	sectionIDFlag := cli.IntFlag{
+		Name:    "section-id",
+		Aliases: []string{"S"},
+		Usage:   "section id",
+	}
+	sectionNameFlag := cli.StringFlag{
+		Name:    "section-name",
+		Aliases: []string{"SN"},
+		Usage:   "section name",
+	}
 	dateFlag := cli.StringFlag{
 		Name:    "date",
 		Aliases: []string{"d"},
@@ -266,6 +276,8 @@ func main() {
 				&labelNamesFlag,
 				&projectIDFlag,
 				&projectNameFlag,
+				&sectionIDFlag,
+				&sectionNameFlag,
 				&dateFlag,
 				&reminderFlg,
 			},
@@ -282,6 +294,8 @@ func main() {
 				&labelNamesFlag,
 				&projectIDFlag,
 				&projectNameFlag,
+				&sectionIDFlag,
+				&sectionNameFlag,
 				&dateFlag,
 			},
 			ArgsUsage: "<Item ID>",
@@ -310,6 +324,12 @@ func main() {
 			Name:      "projects",
 			Usage:     "Show all projects",
 			Action:    Projects,
+			ArgsUsage: " ",
+		},
+		{
+			Name:      "sections",
+			Usage:     "Show all sections",
+			Action:    Sections,
 			ArgsUsage: " ",
 		},
 		{

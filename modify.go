@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/sachaos/todoist/lib"
+	todoist "github.com/sachaos/todoist/lib"
 	"github.com/urfave/cli/v2"
 )
 
@@ -42,6 +42,31 @@ func Modify(c *cli.Context) error {
 		projectID = client.Store.Projects.GetIDByName(c.String("project-name"))
 	}
 
+	sectionID := c.String("section-id")
+	if sectionID == "" {
+		sectionName := c.String("section-name")
+		if sectionName != "" {
+			pID := projectID
+			if pID == "" {
+				pID = item.ProjectID
+			}
+			for _, s := range client.Store.Sections {
+				if s.Name == sectionName && s.ProjectID == pID {
+					sectionID = s.ID
+					if projectID == "" {
+						projectID = s.ProjectID
+					}
+					break
+				}
+			}
+		}
+	} else {
+		section := client.Store.FindSection(sectionID)
+		if section != nil && projectID == "" {
+			projectID = section.ProjectID
+		}
+	}
+
 	if !c.Args().Present() {
 		return CommandFailed
 	}
@@ -50,7 +75,7 @@ func Modify(c *cli.Context) error {
 		return err
 	}
 
-	if err := client.MoveItem(context.Background(), item, projectID); err != nil {
+	if err := client.MoveItem(context.Background(), item, projectID, sectionID); err != nil {
 		return err
 	}
 
