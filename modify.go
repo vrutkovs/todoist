@@ -35,6 +35,8 @@ func Modify(c *cli.Context) error {
 		return names
 	}(c.String("label-names"))
 
+	item.LabelNames = client.Store.NormalizeLabelNames(item.LabelNames)
+
 	item.Due = &todoist.Due{String: c.String("date")}
 
 	projectID := c.String("project-id")
@@ -69,6 +71,10 @@ func Modify(c *cli.Context) error {
 
 	if !c.Args().Present() {
 		return CommandFailed
+	}
+
+	if err := client.EnsureLabelsExist(context.Background(), item.LabelNames); err != nil {
+		return err
 	}
 
 	if err := client.UpdateItem(context.Background(), *item); err != nil {

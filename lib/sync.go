@@ -84,6 +84,26 @@ func (s *Store) FindLabel(id string) *Label {
 	return s.LabelMap[id]
 }
 
+// NormalizeLabelNames converts any label IDs in labelNames to their
+// corresponding label names using the LabelMap. Values that are already
+// names (or not found in the map) are left unchanged. This handles tasks
+// that were cached under the old API v9 format, which stored numeric IDs
+// in the labels field instead of names.
+func (s *Store) NormalizeLabelNames(labelNames []string) []string {
+	result := make([]string, 0, len(labelNames))
+	for _, nameOrID := range labelNames {
+		if nameOrID == "" {
+			continue
+		}
+		if label := s.LabelMap[nameOrID]; label != nil {
+			result = append(result, label.Name)
+		} else {
+			result = append(result, nameOrID)
+		}
+	}
+	return result
+}
+
 func addToBrotherItem(item *Item, b *Item) {
 	i := item
 	for {

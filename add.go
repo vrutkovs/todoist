@@ -69,9 +69,15 @@ func Add(c *cli.Context) error {
 		return names
 	}(c.String("label-names"))
 
+	item.LabelNames = client.Store.NormalizeLabelNames(item.LabelNames)
+
 	item.Due = &todoist.Due{String: c.String("date")}
 
 	item.AutoReminder = c.Bool("reminder")
+
+	if err := client.EnsureLabelsExist(context.Background(), item.LabelNames); err != nil {
+		return err
+	}
 
 	if err := client.AddItem(context.Background(), item); err != nil {
 		return err
